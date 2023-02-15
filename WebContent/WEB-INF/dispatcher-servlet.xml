@@ -1,0 +1,515 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+						http://www.springframework.org/schema/context
+						http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+	<context:component-scan	base-package="org.springframework.samples.petclinic.web" />
+	
+	<!-- 관리자 페이지 작업을 위한 구문 -->
+	
+	<!-- ※ Annotation 표기법으로 Controller 객체를 등록한다. -->
+	<!-- 	: Annotation 표기법으로 작성된 Controller 객체를
+			  스프링 컨테이너가 자동으로 스캔하여 찾아낼 수 있도록 처리 -->
+			  
+	<!-- ① 기존 코드 -->
+	<!-- ※ Annotation 표기법으로 Controller 객체를 등록한다. -->
+	<context:component-scan	base-package="com.fp.mybatis" />
+	<!-- → 『base-package』 속성에 Controller 객체가 포함된
+			패키지 경로를 지정하여 사용한다. -->
+			
+	<!-- ③ mybatis 등록 과정에서 생겨나는 추가 코드 2 -->
+	<!-- ※ mybatis를 사용하기 위한 환경 설정을 추가하는 과정에서
+			필요한 dataSource를 사용하기 위한 환경 설정 추가
+	 		→  -->
+	 <bean id="localDataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+	 	<property name="driverClass" value="oracle.jdbc.driver.OracleDriver"></property>
+	 	<property name="url" value="jdbc:oracle:thin:@localhost:1521:xe"></property>
+	 	<property name="username" value="FP1"></property>
+	 	<property name="password" value="java002$"></property>
+	 </bean>
+	
+	<!-- ② mybatis 등록 과정에서 생겨나는 추가 코드 1 -->
+	<!-- ※ mybatis를 사용하기 위한 환경 설정 추가
+			→ SqlSessionFactoryBean -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+	
+		<!-- ④ dataSource를 등록하고 와서 다시 추가 -->
+		<property name="dataSource" ref="localDataSource"></property>
+		
+		<!-- ⑤ 매퍼 파일 등록 : 매퍼 파일의 위치 전달 -->
+		<property name="mapperLocations" value="classpath:com/fp/mybatis/mapper/*.xml"></property>
+		
+	</bean>
+	
+	<!-- ⑥ mybatis 등록 과정에서 생겨나는 추가 코드 3 -->
+	<!-- ※ SqlSession을 사용하기 위한 환경 설정 추가
+			→ SqlSessionTemplate -->
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg index="0" ref="sqlSessionFactory"></constructor-arg>
+		<!-- 생성자에게 내용을 건네주는 과정 -->
+	</bean>
+	
+	<!-- 유저 페이지 작업을 위한 추가 -->
+	
+	<!-- DAO 등록 -->
+	<bean id="myPageDAO" class="com.fp.dao.MyPageDAO">
+		<property name="dataSource" ref="localDataSource"></property>
+	</bean>
+	
+	<bean id="userPageDAO" class="com.fp.dao.UserPageDAO">
+		<property name="dataSource" ref="localDataSource"></property>
+	</bean>
+	
+	<bean id="usercardDAO" class="com.fp.dao.UserCardDAO">
+		<property name="dataSource" ref="localDataSource"></property>
+	</bean>
+	
+	<bean id="userNoteDAO" class="com.fp.dao.UserNoteDAO">
+		<property name="dataSource" ref="localDataSource"></property>
+	</bean>
+	<bean id="userNoticeDAO" class="com.fp.dao.UserNoticeDAO">
+		<property name="dataSource" ref="localDataSource"></property>
+	</bean>
+	
+	<bean id="scrapDAO" class="com.fp.dao.ScrapDAO">
+      <property name="dataSource" ref="localDataSource"></property>
+   </bean>
+	
+	<bean id="serviceDAO" class="com.fp.dao.ServiceDAO">
+		<property name="dataSource" ref="localDataSource"></property>
+	</bean>
+	
+	<bean id="userReportDAO" class="com.fp.dao.UserReportDAO">
+		<property name="dataSource" ref="localDataSource"></property>
+	</bean>
+	<!-- UserRecordDAO 등록 -->
+   <bean id="userRecordDAO" class="com.fp.dao.UserRecordDAO">
+      <property name="dataSource" ref="localDataSource"></property>
+   </bean>
+	
+	<!-- bookDAO 데이터 소스 등록  -->	
+	<bean id="bookDAO" class="com.fp.dao.UserBookDAO">
+		<property name="dataSource" ref="localDataSource"></property>
+	</bean>
+	
+	
+	<!-- Controller 등록 -->
+	<!-- 미경 -->
+
+	<!-- Login 폼 페이지 요청 Controller 등록 -->
+	<bean name="/userloginform.action" class="com.fp.controller.UserLoginFormController"></bean>
+
+	<!-- ssncheckAjax Controller 등록 -->
+	<bean name="/ssncheck.action" class="com.fp.controller.SsnCheckAjaxController">
+		<property name="dao" ref="userPageDAO"></property>
+	</bean> 
+	
+	<!-- UserLogin 로그인 액션 Controller 등록 -->
+	<bean name="/userlogin.action" class="com.fp.controller.UserLoginController">
+		<property name="dao" ref="userPageDAO"></property>
+	</bean>
+	
+	<!-- UserLogout 로그아웃 액션 Controller 등록 -->
+	<bean name="/userlogout.action" class="com.fp.controller.UserLogoutController"></bean>
+	
+	<!-- UserMain 페이지 요청 Controller 등록 -->
+	<bean name="/usermain.action" class="com.fp.controller.UserMainController">
+	<property name="dao" ref="bookDAO"></property>
+	</bean>
+	
+	<!-- 메인화면 상단바의 검색필드에서 키워드 검색 시 -->
+   <bean name="/usersearch.action" class="com.fp.controller.UserSearchController">
+      <property name="dao" ref="userRecordDAO"></property>
+   </bean>
+   
+	
+	<!-- UserMyInfoUpdateController 등록(유저 개인정보 수정 액션 요청) -->
+	<bean name="/usermyinfoupdate.action" class="com.fp.controller.UserMyInfoUpdateController">
+		<property name="dao" ref="myPageDAO"></property>
+	</bean>
+	
+	<!-- UserMyInfoUpdateFormController 등록(유저 개인정보 수정 폼 요청) -->
+	<bean name="/usermyinfoupdateform.action" class="com.fp.controller.UserMyInfoUpdateFormController">
+		<property name="dao" ref="myPageDAO"></property>
+	</bean> 
+		<!-- UserMyInfoController 등록 --> 
+	<bean name="/usermyinfo.action" class="com.fp.controller.UserMyInfoController">
+		<property name="dao" ref="myPageDAO"></property>
+	</bean>
+		
+	<!-- UserPwFindForm 비밀번호 재설정 폼 요청 -->
+	<bean name="/userpwfindformm.action" class="com.fp.controller.UserPwFindFormController"></bean>
+	
+	<!-- UserWithdrawal 회원탈퇴 페이지 요청 -->
+	<bean name="/userwithdrawal.action" class="com.fp.controller.UserWithdrawalController"></bean>
+	
+	<!-- pwcheckAjax 컨트롤러 등록  -->
+	<bean name="/pwcheck.action" class="com.fp.controller.PwCheckAjaxController">
+		<property name="userdao" ref="userPageDAO"></property>
+		<property name="mydao" ref="myPageDAO"></property>
+	</bean>
+	
+	<!-- UserWithdrawal 회원탈퇴 액션 요청 -->
+	<bean name="/userwithdrawaldelete.action" class="com.fp.controller.UserWithdrawalDeleteController">
+		<property name="dao" ref="userPageDAO"></property>
+	</bean>
+	
+	<!-- UserQuestionForm 질문하기 폼 요청 -->
+	<bean name="/userquestionform.action" class="com.fp.controller.UserQuestionFormController"></bean>
+	
+	<!-- UserNoticeList 공지사항 리스트 페이지 요청 -->
+	<bean name="/usernoticelist.action" class="com.fp.controller.UserNoticeListController">
+		<property name="dao" ref="userNoticeDAO"></property>
+	</bean>
+	
+	<!-- UserNotice 공지사항 게시글 세부열람 페이지 요청 -->
+	<bean name="/usernotice.action" class="com.fp.controller.UserNoticeController">
+		<property name="dao" ref="userNoticeDAO"></property>
+	</bean> 
+	
+	<!-- UserFAQList 자주 묻는 질문 리스트 페이지 요청 -->
+	<bean name="/userfaqlist.action" class="com.fp.controller.UserFAQListController">
+		<property name="dao" ref="serviceDAO"></property>
+	</bean>
+	
+	<!-- UserQuestionInsert 질문 인서트 액션 -->
+	<bean name="/userquestioninsert.action" class="com.fp.controller.UserQuestionInsertController">
+		<property name="dao" ref="serviceDAO"></property>
+	</bean>
+	
+	<!-- NickNameAjax 닉네임 중복 확인 -->
+	<bean name="/nicknamecheck.action" class="com.fp.controller.NickNameAjaxController">
+		<property name="dao" ref="userPageDAO"></property>
+	</bean>
+	
+	<!-- UserFileUpload 회원 프로필 수정 요청 -->
+	<bean name="/fileupload.action" class="com.fp.controller.UserFileUploadController">
+		<property name="dao" ref="myPageDAO"></property>
+	</bean>
+
+	<!-- UserProfileDelete 회원 프로필 삭제 요청 -->
+	<bean name="/userprofiledelete.action" class="com.fp.controller.UserProfileDeleteController">
+		<property name="dao" ref="myPageDAO"></property>
+	</bean>
+	<!-- 신고 폼 요청 -->
+	<bean name="/userreportform.action" class="com.fp.controller.UserReportFormController">
+		<!-- <property name="dao" ref="userReportDAO"></property> -->
+		<property name="mydao" ref="myPageDAO"></property>
+	</bean>
+	
+	<!-- 신고 인서트 액션 요청 시 -->
+	<bean name="/userreport.action" class="com.fp.controller.UserReportController">
+		<property name="dao" ref="userReportDAO"></property>
+	</bean>
+	
+
+	<!-- 연수 -->
+	<!-- UserMyPageLikedbookController 등록 -->
+	<bean name="/usermypagelikedbook.action" class="com.fp.controller.UserMyPageLikedbookController">
+		<property name="dao" ref="myPageDAO"></property>
+		<property name="userDao" ref="userPageDAO"></property>
+	</bean>
+	
+	<!-- UserMyPageWritecommentController 등록 -->
+	<bean name="/usermypagewritecomment.action" class="com.fp.controller.UserMyPageWritecommentController">
+		<property name="dao" ref="myPageDAO"></property>
+		<property name="userDao" ref="userPageDAO"></property>
+	</bean>
+	
+	<!-- UserMyQnAController 등록 -->
+	<bean name="/usermyqna.action" class="com.fp.controller.UserMyQnAController">
+		<property name="dao" ref="serviceDAO"></property>	
+	</bean>
+	
+	<!-- UserMyReportController 등록 -->
+	<bean name="/usermyreport.action" class="com.fp.controller.UserMyReportController">
+		<property name="dao" ref="serviceDAO"></property>
+	</bean>
+	
+	<!-- UserMyWarningController 등록 -->
+	<bean name="/usermywarning.action" class="com.fp.controller.UserMyWarningController">
+		<property name="dao" ref="serviceDAO"></property>
+	</bean>
+ 
+	<!-- UserCardInsertFormController 등록 -->
+	<bean name="/usercardinsertform.action" class="com.fp.controller.UserCardInsertFormController"></bean>
+	
+	<!-- UserCardInsertController 등록 -->
+	<bean name="/usercardinsert.action" class="com.fp.controller.UserCardInsertController">
+		<property name="dao" ref="usercardDAO"></property>
+		<property name="noteDao" ref="userNoteDAO"></property>
+	</bean>
+
+	<!-- UserCardPayInsertController 등록 -->
+	<bean name="/usercardpayinsert.action" class="com.fp.controller.UserCardPayInsertController">
+		<property name="dao" ref="usercardDAO"></property>
+		<property name="noteDao" ref="userNoteDAO"></property>
+	</bean>
+	
+	<!-- UserCardController 등록 -->
+	<bean name="/usercard.action" class="com.fp.controller.UserCardController">
+		<property name="dao" ref="usercardDAO"></property>
+	</bean>
+	
+	<!-- UserCardUpdateFormController 등록 -->
+	<bean name="/usercardupdateform.action" class="com.fp.controller.UserCardUpdateFormController">
+		<property name="dao" ref="usercardDAO"></property>
+	</bean>
+	
+	<!-- UserCardUpdateController 등록 -->
+	<bean name="/usercardupdate.action" class="com.fp.controller.UserCardUpdateController">
+		<property name="dao" ref="usercardDAO"></property>
+	</bean>
+	
+	<!-- UserCardPayUpdateController 등록 -->
+	<bean name="/usercardpayupdate.action" class="com.fp.controller.UserCardPayUpdateController">
+		<property name="dao" ref="usercardDAO"></property>
+	</bean>
+	
+	<!-- UserPayDeleteController 등록 -->
+	<bean name="/userpaydelete.action" class="com.fp.controller.UserPayDeleteController">
+		<property name="dao" ref="usercardDAO"></property>
+	</bean>
+	
+	<!--  UserCardDeleteController 등록  -->
+	<bean name="/usercarddelete.action" class="com.fp.controller.UserCardDeleteController">
+	<property name="dao" ref="usercardDAO"/>
+	</bean>
+	
+	<!-- UserNoteListController 등록 -->
+	<bean name="/usernotelist.action" class="com.fp.controller.UserNoteListController">
+		<property name="dao" ref="userNoteDAO"></property>
+	</bean>
+
+	<!-- UserNoteController 등록 -->
+	<bean name="/usernote.action" class="com.fp.controller.UserNoteController">
+		<property name="dao" ref="userNoteDAO"></property>
+	</bean>
+	
+	<!-- UserNoteInsertFormController 등록 -->
+	<bean name="/usernoteinsertform.action" class="com.fp.controller.UserNoteInsertFormController">
+		<property name="dao" ref="myPageDAO"></property>
+	</bean>
+
+	<!-- UserNoteInsertController 등록 -->
+	<bean name="/usernoteinsert.action" class="com.fp.controller.UserNoteInsertController">
+		<property name="dao" ref="userNoteDAO"></property>
+	</bean>
+	
+	<!-- UserNoteUpdateFormController 등록 -->
+	<bean name="/usernoteupdateform.action" class="com.fp.controller.UserNoteUpdateFormController">
+		<property name="dao" ref="userNoteDAO"></property>
+		<property name="myPageDao" ref="myPageDAO"></property>
+	</bean>
+	
+	<!-- UserNoteUpdateController 등록 -->
+	<bean name="/usernoteupdate.action" class="com.fp.controller.UserNoteUpdateController">
+		<property name="dao" ref="userNoteDAO"></property>
+	</bean>
+	
+	<!-- UserScrapCardUpdateFormController 등록 -->
+	<bean name="/userscrapcardupdateform.action" class="com.fp.controller.UserScrapCardUpdateFormController">
+		<property name="dao" ref="usercardDAO"></property>
+	</bean>
+	
+	<!-- UserNoteUpdateCancelController 등록 -->
+	<bean name="/usernoteupdatecancel.action" class="com.fp.controller.UserNoteUpdateCancelController">
+		<property name="dao" ref="userNoteDAO"></property>
+	</bean>
+	
+	<!-- UserNoteUpdateCancelController 등록 -->
+	<bean name="/usernotedelete.action" class="com.fp.controller.UserNoteDeleteController">
+		<property name="dao" ref="userNoteDAO"></property>
+	</bean>
+	
+	
+	<!-- 보경  -->
+	
+	<bean name="/resiinsert.action" class="com.fp.controller.UserAgreeController">
+	</bean>
+	
+	<!-- IdAjaxController 등록 -->
+	<bean name="/idajax.action" class="com.fp.controller.IdcheckAjaxController">
+		<property name="dao" ref="userPageDAO"></property>
+	</bean>
+	
+	<!-- UserInsertController 등록 -->
+	<bean name="/userinsertform.action" class="com.fp.controller.UserInsertFormController">
+	</bean>
+	
+	<bean name="/userinsert.action" class="com.fp.controller.UserInsertController">
+		<property name="dao" ref="userPageDAO"></property>
+	</bean>
+	
+	<bean name="/nameajax.action" class="com.fp.controller.NameAjaxController">
+		<property name="dao" ref="userPageDAO"></property>
+	</bean>
+	
+	<bean name="/userregiform.action" class="com.fp.controller.UserCategoryListController">
+		<property name="dao" ref="myPageDAO"></property>
+	</bean>
+	
+	<bean name="/userwelcome.action" class="com.fp.controller.UserWelcomeController">
+		<property name="dao" ref="userPageDAO"></property>
+	</bean>
+	
+	<!-- 아이디 찾기 -->
+	<bean name="/useridfindform.action" class="com.fp.controller.UserFindIdController"></bean>
+	<bean name="/useridconfirmform.action" class="com.fp.controller.UserFindIdConfirmController">
+		<property name="dao" ref="userPageDAO"></property>
+	</bean>
+	
+	<!-- 비밀번호 찾기 -->
+	<bean name="/userpwfindform.action" class="com.fp.controller.UserFindPwController"></bean>
+	<bean name="/findpwconfirm.action" class="com.fp.controller.UserFindPwConfirmController">
+		<property name="dao" ref="userPageDAO"></property>
+	</bean>
+	
+	<bean name="/pwupdate.action" class="com.fp.controller.UserPwUpdateController">
+		<property name="dao" ref="userPageDAO"></property>
+	</bean>
+	
+	<!-- UserOtherProfilebookController 등록 -->
+	<bean name="/userotherprofilebook.action" class="com.fp.controller.UserOtherProfilebookController">
+		<property name="dao" ref="myPageDAO"></property>
+		<property name="userDao" ref="userPageDAO"></property>
+	</bean>
+	
+	
+	<!-- UserOtherProfilecardController 등록 -->
+	<bean name="/userotherprofilecard.action" class="com.fp.controller.UserOtherProfilecardController">
+		<property name="dao" ref="myPageDAO"></property>
+		<property name="userDao" ref="userPageDAO"></property>
+	</bean>
+	
+	<!--현하  -->
+	
+	<!-- 스크랩선택리스트 Controller 등록  -->
+	<bean name="/userscrapselectlist.action" class="com.fp.controller.UserScrapSelectListController">
+		<property name="scrapDAO" ref="scrapDAO"></property>
+	</bean>
+	
+	<!-- 스크랩테이블에 추가 Controller 등록  -->
+	<bean name="/userscrapselectinsert.action" class="com.fp.controller.UserScrapSelectInsertController">
+		<property name="scrapDAO" ref="scrapDAO"></property>
+	</bean>
+	
+	<!-- 나의스크랩리스트 Controller 등록  -->
+	<bean name="/userscraplist.action" class="com.fp.controller.UserScrapListController">
+		<property name="scrapDAO" ref="scrapDAO"></property>
+	</bean>
+	
+	<!-- 스크랩리스트에서 삭제 Controller 등록  -->
+	<bean name="/userscrapdelete.action" class="com.fp.controller.UserScrapDeleteController">
+		<property name="scrapDAO" ref="scrapDAO"></property>
+	</bean>
+	
+	<!-- 나의스크랩리스트 Controller 등록  -->
+	<bean name="/usernotescrapselectlist.action" class="com.fp.controller.UserNoteScrapSelectListController">
+		<property name="scrapDAO" ref="scrapDAO"></property>
+	</bean>
+	
+	<!-- 임시  -->
+	<!-- 다른사람카드 리스트 Controller  -->
+	<bean name="/userscrapotherprofilecardlist.action" class="com.fp.controller.UserScrapOtherProfileCardListController">
+	</bean>
+	
+	<!-- 다른사람카드 스크랩 Controller  -->
+	<bean name="/userscrapotherprofilecardinsert.action" class="com.fp.controller.UserScrapOtherProfileCardInsertController">
+		<property name="scrapDAO" ref="scrapDAO"></property>
+	</bean>
+	
+	
+	<!-- 현하 추가 (좋아요 관련) -->
+	<!-- UserLikedInsertController 등록 -->
+	<bean name="/userlikedinsert.action" class="com.fp.controller.UserLikedInsertController">
+		<property name="dao" ref="bookDAO"></property>
+	</bean>
+	
+	
+	<!-- UserLikedDeleteController 등록 -->
+	<bean name="/userlikeddelete.action" class="com.fp.controller.UserLikedDeleteController">
+		<property name="dao" ref="bookDAO"></property>
+	</bean>
+	
+	
+	
+	<!-- 태민 (유저메인 + 여행책) + 여행노트 추가작성  -->
+	<!-- UserMainController 등록 -->
+<!-- 	<bean name="/usermain.action" class="com.fp.controller.UserMainController">
+		이후 UserBookDAO관련 프로퍼티 등록해줘야함
+	</bean>
+ -->	
+	
+	<!-- UserAllBookListController 등록 -->
+	<bean name="/userallbooklist.action" class="com.fp.controller.UserAllBookListController">
+		<!-- 이후 UserBookDAO관련 프로퍼티 등록해줘야함 -->
+		<property name="dao" ref="bookDAO"></property>
+	</bean>
+	<!-- UserBookListController 등록 -->
+	<bean name="/userbooklist.action" class="com.fp.controller.UserBookListController">
+		<!-- 이후 UserBookDAO관련 프로퍼티 등록해줘야함 -->
+		<property name="dao" ref="bookDAO"></property>
+	</bean>
+	
+	<!-- UserBookController 등록 -->
+	<bean name="/userbook.action" class="com.fp.controller.UserBookController">
+		<!-- 이후 UserBookDAO관련 프로퍼티 등록해줘야함 -->
+		<property name="dao" ref="bookDAO"></property>
+	</bean>
+	
+	
+	<!-- UserBookInsertFormController 등록 -->
+	<bean name="/userbookinsertform.action" class="com.fp.controller.UserBookInsertFormController">
+		<!-- 이후 UserBookDAO관련 프로퍼티 등록해줘야함 -->
+		<property name="dao" ref="bookDAO"></property>
+	</bean>
+	
+	
+	<!-- UserBookInsertController 등록 -->
+	<bean name="/userbookinsert.action" class="com.fp.controller.UserBookInsertController">
+		<!-- 이후 UserBookDAO관련 프로퍼티 등록해줘야함 -->
+		<property name="dao" ref="bookDAO"></property>
+	</bean>
+	
+	
+	<!-- UserAjaxNotedCardController 등록 -->
+	<bean name="/notedcardajax.action" class="com.fp.controller.UserAjaxNotedCardController">
+		<!-- 이후 UserBookDAO관련 프로퍼티 등록해줘야함 -->
+		<property name="dao" ref="bookDAO"></property>
+	</bean>
+	
+	
+		<!-- UserBookUpdateFormController 등록 -->
+	<bean name="/userbookupdateform.action" class="com.fp.controller.UserBookUpdateFormController">
+		<!-- 이후 UserBookDAO관련 프로퍼티 등록해줘야함 -->
+		<property name="dao" ref="bookDAO"></property>
+	</bean>
+	
+		<!-- UserBookUpdateController 등록 -->
+	<bean name="/userbookupdate.action" class="com.fp.controller.UserBookUpdateController">
+		<!-- 이후 UserBookDAO관련 프로퍼티 등록해줘야함 -->
+		<property name="dao" ref="bookDAO"></property>
+	</bean>
+	
+	
+		<!-- UserBookDeleteController 등록 -->
+	<bean name="/userbookdelete.action" class="com.fp.controller.UserBookDeleteController">
+		<!-- 이후 UserBookDAO관련 프로퍼티 등록해줘야함 -->
+		<property name="dao" ref="bookDAO"></property>
+	</bean>
+	
+		<!-- UserAjaxBookedCardDeleteController 등록 -->
+	<bean name="/userajaxbookedcarddelete.action" class="com.fp.controller.UserAjaxBookedCardDeleteController">
+		<!-- 이후 UserBookDAO관련 프로퍼티 등록해줘야함 -->
+		<property name="dao" ref="bookDAO"></property>
+	</bean>
+	
+	
+	
+	
+</beans>

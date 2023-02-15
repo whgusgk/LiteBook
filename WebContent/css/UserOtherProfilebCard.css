@@ -1,0 +1,97 @@
+ @charset "UTF-8";
+
+   .Site {
+     display: flex;
+     height:1600px;
+     flex-direction: column;
+   }
+   
+     .Site-content {
+     height:1600px;
+     flex: 1;
+     
+   } 
+   .pageNav{
+      margin-top:50px;
+     margin-left:45%;   
+      bottom: 30px;
+      width:30%;
+   }
+  .main_header{
+    display:flex;
+    justify-content:space-between; 
+    width:89%;
+    margin-left: 5%;
+  }
+  .main_leftHeader{
+     margin-left:350px;
+  }
+  .main_rightHeader{
+     margin_right:350px;
+  }
+  .main_title{
+    margin-top:20px;
+     margin-left:350px;
+  }
+  .main_list{
+     width:60%;
+     margin:auto;
+  }
+  .spaceArea{
+     width:100%;
+     height:100px;
+  }
+  .main_title h3{
+     font-size:20px;
+     display:inline-block;
+  }
+  .main_title h5{
+      font-size:15px;
+      margin-left:3px;
+     display:inline-block;
+  }
+.theme-bg-white {
+    background-color: #fff !important;
+}
+  .containerDiv{
+          display:flex;
+       }
+      .tableDiv{
+          width:100%;
+          height:80vh;
+       }
+     #cardBtn
+   {
+      background-color: rgba(241, 240, 240, 0.96);
+      border: rgba(241, 240, 240, 0.96);
+      width: 50%;
+      margin-right: 2px;
+      color:black;
+   }
+   #bookBtn
+   {
+      background-color: #1DB1F8;
+      border: #1DB1F8;
+      width: 50%;
+      margin-left: 3px;
+   }
+    .main_list{
+        margin-right: 60%;
+        margin-left: 5%;
+    }
+
+     .table{
+        width:150%;
+       
+     }
+       #type{
+       appearance:auto;
+       }
+    .table th{
+          background-color:rgb(197, 196, 196);
+       }
+  
+   .table_content{
+      width:60%;
+      margin:auto;
+   }

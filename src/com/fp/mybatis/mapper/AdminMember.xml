@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fp.mybatis.IAdminMemberDAO">
+	<select id="memberList" resultType="com.fp.dto.AdminMemberDTO">
+	SELECT RNUM, SIGN_NUM, USER_ID, USER_NAME, USER_DATE, WARNING_COUNT, STOP_TYPE
+    FROM
+    (SELECT ROWNUM AS RNUM, U.SIGN_NUM AS SIGN_NUM , U.USER_ID AS USER_ID, U.USER_NAME AS
+	USER_NAME, TO_CHAR(U.USER_DATE, 'YYYY-MM-DD') AS USER_DATE
+	, NVL(V.WARNING_COUNT,0) AS WARNING_COUNT, NVL(V.STOP_TYPE, 'N') AS
+	STOP_TYPE
+	FROM USERS U FULL JOIN VIEW_USERWARNINGCOUNT V
+	ON U.SIGN_NUM = V.WARNING_USER
+    WHERE U.SIGN_NUM IS NOT NULL
+	ORDER BY SIGN_NUM)
+    WHERE RNUM <![CDATA[>=]]> #{start} AND RNUM <![CDATA[<=]]> #{end}
+	</select>
+	
+	<select id="memberCount" resultType="java.lang.Integer">
+	SELECT COUNT(*)
+	FROM USERS U FULL JOIN VIEW_USERWARNINGCOUNT V
+	ON U.SIGN_NUM = V.WARNING_USER
+	WHERE U.SIGN_NUM IS NOT NULL
+	ORDER BY SIGN_NUM
+	</select>
+
+	<select id="memberInfo" resultType="com.fp.dto.AdminMemberDTO">
+	SELECT U.USER_NAME AS USER_NAME, U.USER_ID AS USER_ID, U.SIGN_NUM AS SIGN_NUM,
+	NVL(U.USER_INTRO, '안녕하세요.') AS USER_INTRO
+	, U.USER_EMAIL AS USER_EMAIL, U.USER_TEL AS USER_TEL, G.GENDER_NAME AS
+	USER_GENDER, TO_CHAR(U.USER_BIRTH, 'YYYY-MM-DD') AS USER_BIRTH
+	FROM USERS U JOIN GENDER G
+	ON
+	U.GENDER_NUM = G.GENDER_NUM
+	WHERE U.SIGN_NUM = #{sign_num}
+	</select>
+	
+	<select id="bookList" resultType="com.fp.dto.AdminMemberDTO">
+	SELECT RNUM, BOOK_NUM, BOOK_TITLE, BOOK_DATE
+	FROM (SELECT ROWNUM AS RNUM, B.BOOK_NUM AS BOOK_NUM, B.BOOK_TITLE AS BOOK_TITLE , TO_CHAR(B.BOOK_DATE, 'YYYY-MM-DD')
+	AS BOOK_DATE
+	,NVL((
+	SELECT CASE WHEN (STATUS_NUM = 0) OR (STATUS = 1) THEN '○'
+	ELSE 'Ⅹ' END AS BOOK_BLIND
+	FROM VIEW_REPORTLIST
+	WHERE TYPE='book' AND CANCEL_NUM IS NULL
+	AND ARTICLE = B.BOOK_NUM
+	)
+	, 'Ⅹ') AS BOOK_BLIND
+	FROM BOOK B
+	WHERE SIGN_NUM = #{sign_num}
+    ORDER BY B.BOOK_NUM)
+	WHERE RNUM <![CDATA[>=]]> #{start} AND RNUM <![CDATA[<=]]> #{end}
+	</select>
+	
+	<select id="memberBookCount" resultType="java.lang.Integer">
+	SELECT COUNT(*)
+	FROM BOOK
+	WHERE SIGN_NUM=#{sign_num}
+	</select>
+	
+	<select id="cardList" resultType="com.fp.dto.AdminMemberDTO">
+	SELECT RNUM, CARD_NUM, CARD_LOCATION, CARD_BLIND, CARD_BUDGET, USER_NAME, CARD_DATE
+	FROM(SELECT ROWNUM AS RNUM, C.CARD_NUM AS CARD_NUM, C.CARD_LOCATION AS CARD_LOCATION
+	, NVL(( SELECT CASE WHEN CANCEL_NUM IS NULL THEN '○'
+	WHEN CANCEL_NUM IS NOT NULL THEN 'Ⅹ' ELSE 'Ⅹ' END AS CARD_BLIND
+	FROM VIEW_REPORTLIST
+	WHERE TYPE = 'card'
+	AND C.CARD_NUM = ARTICLE
+	), 'Ⅹ') AS CARD_BLIND
+	, NVL(C.CARD_BUDGET, 0) AS CARD_BUDGET
+	, ( SELECT USER_NAME
+	FROM USERS
+	WHERE C.SIGN_NUM = SIGN_NUM
+	) AS USER_NAME
+	, TO_CHAR(C.CARD_DATE, 'YYYY-MM-DD') AS CARD_DATE
+	FROM CARD C
+	WHERE C.OPEN_NUM = 1 AND C.CARD_DATE IS NOT NULL
+	AND C.SIGN_NUM=#{sign_num})
+	WHERE RNUM <![CDATA[>=]]> #{start} AND RNUM <![CDATA[<=]]> #{end}
+    ORDER BY RNUM
+	</select>
+	
+	<select id="memberCardCount" resultType="java.lang.Integer">
+	SELECT COUNT(*)
+	FROM CARD
+	WHERE OPEN_NUM = 1 AND CARD_DATE IS NOT NULL
+	AND SIGN_NUM =#{sign_num}
+	</select>
+	
+	<select id="commentList" resultType="com.fp.dto.AdminMemberDTO">
+	SELECT RNUM, COMMENT_NUM, COMMENT_CONTENT, COMMENT_DATE, BOOK_NUM, COMMENT_BLIND
+	FROM
+	(
+	SELECT ROWNUM AS RNUM, V.COMMENT_NUM AS COMMENT_NUM, V.COMMENT_CONTENT AS
+	COMMENT_CONTENT, TO_CHAR(V.COMMENT_DATE, 'YYYY-MM-DD') AS COMMENT_DATE, V.BOOK_NUM AS BOOK_NUM
+	,NVL((SELECT CASE WHEN (STATUS_NUM = 0) OR (STATUS = 1) THEN '○'
+	ELSE 'Ⅹ' END AS COMMENT_BLIND
+	FROM VIEW_REPORTLIST
+	WHERE TYPE='comment' AND CANCEL_NUM IS NULL
+	AND ARTICLE = V.COMMENT_NUM
+	), 'Ⅹ') AS COMMENT_BLIND
+	FROM VIEW_COMMENTLIST V
+	WHERE V.SIGN_NUM = #{sign_num}
+	ORDER BY COMMENT_NUM
+	)
+	WHERE RNUM <![CDATA[>=]]> #{start} AND RNUM <![CDATA[<=]]> #{end}
+	</select>
+	
+	<select id="memberCommentCount" resultType="java.lang.Integer">
+	SELECT COUNT(*)
+	FROM VIEW_COMMENTLIST V
+	WHERE V.SIGN_NUM = #{sign_num}
+	</select>
+	
+	<select id="warningList" resultType="com.fp.dto.AdminMemberDTO">
+	SELECT TYPE, STATUS_NUM, STATUS_ADMIN, NVL(TO_CHAR(STATUS_DATE,'YYYY-MM-DD'), '') AS STATUS_DATE, NVL(TO_CHAR(CANCEL_DATE,'YYYY-MM-DD'), ' ') AS CANCEL_DATE
+	,REASON, WARNING_USER AS SIGN_NUM
+	FROM VIEW_USERWARNINGLIST
+	WHERE WARNING_USER = #{sign_num}
+	ORDER BY STATUS_NUM
+	</select>
+	
+	<select id="memberWarningCount" resultType="java.lang.Integer">
+	SELECT COUNT(*)
+	FROM VIEW_USERWARNINGLIST
+	WHERE WARNING_USER = #{sign_num}
+	</select>
+	
+	<insert id="bWarningCancelInsert" >	 	
+	    INSERT INTO BWARNING_CANCEL(BCANCEL_NUM, ADMIN_NUM, BSTATUS_NUM, REASON_NUM, BCANCEL_MEMO)
+		VALUES(BWARNING_CANCEL_SEQ.NEXTVAL, #{admin_num}, #{bstatus_num}, #{reason_num}, #{bcancel_memo})
+	</insert>
+	
+	<insert id="cWarningCancelInsert">		
+	    INSERT INTO CWARNING_CANCEL(CCANCEL_NUM, ADMIN_NUM, CSTATUS_NUM, REASON_NUM, CCANCEL_MEMO)
+		VALUES(CWARNING_CANCEL_SEQ.NEXTVAL, #{admin_num}, #{cstatus_num}, #{reason_num}, #{ccancel_memo})
+	</insert>
+	
+	<insert id="coWarningCancelInsert">		
+	    INSERT INTO COWARNING_CANCEL(COCANCEL_NUM, ADMIN_NUM, COSTATUS_NUM, REASON_NUM, COCANCEL_MEMO)
+		VALUES(COWARNING_CANCEL_SEQ.NEXTVAL, #{admin_num}, #{costatus_num}, #{reason_num}, #{cocancel_memo})
+	</insert>
+	
+	<select id="idSearchMemberList" resultType="com.fp.dto.AdminMemberDTO">
+	SELECT RNUM, SIGN_NUM, USER_ID, USER_NAME, USER_DATE, WARNING_COUNT, STOP_TYPE
+	FROM
+	(SELECT ROWNUM AS RNUM, U.SIGN_NUM AS SIGN_NUM , U.USER_ID AS USER_ID, U.USER_NAME AS
+	USER_NAME, TO_CHAR(U.USER_DATE, 'YYYY-MM-DD') AS USER_DATE 
+	, NVL(V.WARNING_COUNT,0) AS WARNING_COUNT, NVL(V.STOP_TYPE, 'N') AS
+	STOP_TYPE
+	FROM USERS U FULL JOIN VIEW_USERWARNINGCOUNT V
+	ON U.SIGN_NUM = V.WARNING_USER
+	WHERE USER_ID LIKE '%'||#{value}||'%'
+	ORDER BY SIGN_NUM
+	)
+	WHERE RNUM <![CDATA[>=]]> #{start} AND RNUM <![CDATA[<=]]> #{end}
+	
+	</select>
+	
+	<select id="idMemberCount" resultType="java.lang.Integer">
+	SELECT COUNT(*)
+	FROM USERS U FULL JOIN VIEW_USERWARNINGCOUNT V
+	ON U.SIGN_NUM = V.WARNING_USER
+	WHERE USER_ID LIKE '%'||#{value}||'%'
+	</select>
+	
+	<select id="nameSearchMemberList" resultType="com.fp.dto.AdminMemberDTO">
+	SELECT RNUM, SIGN_NUM, USER_ID, USER_NAME, USER_DATE, WARNING_COUNT, STOP_TYPE
+	FROM
+	(
+	SELECT ROWNUM AS RNUM, U.SIGN_NUM AS SIGN_NUM , U.USER_ID AS USER_ID, U.USER_NAME AS
+	USER_NAME, TO_CHAR(U.USER_DATE, 'YYYY-MM-DD') AS USER_DATE
+	, NVL(V.WARNING_COUNT,0) AS WARNING_COUNT, NVL(V.STOP_TYPE, 'N') AS
+	STOP_TYPE
+	FROM USERS U FULL JOIN VIEW_USERWARNINGCOUNT V
+	ON U.SIGN_NUM = V.WARNING_USER
+	WHERE USER_NAME LIKE '%'||#{value}||'%'
+	ORDER BY SIGN_NUM
+	)
+	WHERE RNUM <![CDATA[>=]]> #{start} AND RNUM <![CDATA[<=]]> #{end}
+	</select>
+	
+	<select id="nameMemberCount" resultType="java.lang.Integer">
+	SELECT COUNT(*)
+	FROM USERS U FULL JOIN VIEW_USERWARNINGCOUNT V
+	ON U.SIGN_NUM = V.WARNING_USER
+	WHERE USER_NAME LIKE '%'||#{value}||'%'
+	</select>
+</mapper>

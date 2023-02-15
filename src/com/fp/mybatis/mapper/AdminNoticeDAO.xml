@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fp.mybatis.IAdminNoticeDAO">
+	
+	<select id="count" resultType="java.lang.Integer">
+		SELECT COUNT(*) AS COUNT
+		FROM NOTICE
+		WHERE NOTICE_TITLE LIKE '%'||#{keyword}||'%'
+	</select>
+	
+	<select id="list" parameterType="java.lang.String" resultType="com.fp.dto.NoticeDTO">
+		SELECT RNUM, NOTICE_NUM, NOTICE_TITLE, TO_CHAR(NOTICE_DATE, 'YYYY-MM-DD HH:MM') AS NOTICE_DATE
+		FROM (SELECT ROWNUM AS RNUM, DATA.*
+      		  FROM (SELECT NOTICE_NUM, NOTICE_TITLE, NOTICE_DATE
+            		FROM NOTICE
+            		WHERE NOTICE_TITLE LIKE '%'||#{keyword}||'%'
+            		ORDER BY NOTICE_NUM DESC) DATA)
+		WHERE RNUM <![CDATA[>=]]> #{start} AND RNUM <![CDATA[<=]]> #{end}
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO NOTICE (NOTICE_NUM, ADMIN_NUM, NOTICE_TITLE, NOTICE_CONTENT)
+		VALUES (NOTICE_SEQ.NEXTVAL, #{admin_num}, #{notice_title}, #{notice_content})
+	</insert>
+	
+	<update id="update">
+		UPDATE NOTICE
+		SET NOTICE_TITLE = #{notice_title}, NOTICE_CONTENT = #{notice_content}
+		WHERE NOTICE_NUM = #{notice_num}
+	</update>
+	
+	<delete id="delete">
+		DELETE
+		FROM NOTICE
+		WHERE NOTICE_NUM = #{notice_num}
+	</delete>
+
+	<select id="search" resultType="com.fp.dto.NoticeDTO">
+		SELECT NOTICE_NUM, NOTICE_TITLE, TO_CHAR(NOTICE_DATE, 'YYYY-MM-DD HH:MM') AS NOTICE_DATE, NOTICE_CONTENT
+		FROM NOTICE
+		WHERE NOTICE_NUM = #{notice_num}
+	</select> 
+	
+	
+
+</mapper>

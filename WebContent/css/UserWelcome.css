@@ -1,0 +1,68 @@
+ @charset "UTF-8";
+
+  body {
+      min-height: 100vh;
+
+      background: -webkit-gradient(linear, left bottom, right top, from(#92b5db), to(#1d466c));
+      background: -webkit-linear-gradient(bottom left, #92b5db 0%, #1d466c 100%);
+      background: -moz-linear-gradient(bottom left, #92b5db 0%, #1d466c 100%);
+      background: -o-linear-gradient(bottom left, #92b5db 0%, #1d466c 100%);
+      background: linear-gradient(to top right, #92b5db 0%, #1d466c 100%);
+    }
+
+    .input-form {
+      max-width: 1000px;
+
+      margin-top: 150px;
+      padding: 50px;
+
+      background: #fff;
+      -webkit-border-radius: 10px;
+      -moz-border-radius: 10px;
+      border-radius: 10px;
+      -webkit-box-shadow: 0 8px 20px 0 rgba(0, 0, 0, 0.15);
+      -moz-box-shadow: 0 8px 20px 0 rgba(0, 0, 0, 0.15);
+      box-shadow: 0 8px 20px 0 rgba(0, 0, 0, 0.15)
+    }
+     .telInput{
+      display:flex;
+      gap:10px;
+      width: 30;
+   }
+   #CheckBtn
+   {
+         /*display:flex;*/
+         width:180px;
+         height:38px;
+         backgroud-color: #494779;
+   }
+   
+   .inputCustom{
+      display:flex;
+      gap:10px;
+   }
+    
+    .validation-form{
+       padding-left:40px;
+    }
+  .mypage
+  {
+  	background-color: #96aad2;
+  }
+  .mainpage
+  {
+  	background-color: #11adc4;
+  }
+  .writepage
+  {
+  	background-color: #4da3f0;
+  }
+  .likebook
+  {
+  	background-color:#9ac7ef;
+  }
+  .text-center>button {
+   	margin-left: 30px;
+    margin-right: 50px;
+	
+}

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fp.mybatis.IAdminDAO">
+
+<select id="searchAccount" resultType="com.fp.dto.AdminDTO">
+SELECT ADMIN_ID, ADMIN_NAME, ADMIN_TEL, TO_CHAR(ADMIN_BIRTH,'YYYY-MM-DD') AS ADMIN_BIRTH
+, ADMIN_EMAIL, GENDER_NUM
+, CASE WHEN GENDER_NUM = 1 THEN '남성'
+       WHEN GENDER_NUM = 2 THEN '여성'
+ELSE '선택안함' END AS GENDER
+FROM ADMIN
+WHERE ADMIN_NUM= #{admin_num}
+</select>
+
+<select id="searchId" resultType="java.lang.String">
+SELECT TO_CHAR(COUNT(ADMIN_ID)) AS ADMIN_ID
+FROM ADMIN
+WHERE ADMIN_ID = #{admin_id}
+</select>
+
+<select id="searchPw" resultType="java.lang.String" parameterType="java.lang.String">
+SELECT ADMIN_ID
+FROM ADMIN
+WHERE ADMIN_ID = #{admin_id}
+AND ADMIN_PW = CRYPTPACK.ENCRYPT(#{admin_pw}, #{admin_pw})
+</select>
+
+<select id="sessionAdminNum" resultType="java.lang.String">
+SELECT ADMIN_NUM
+FROM ADMIN
+WHERE ADMIN_ID = #{admin_id}
+</select>
+
+<update id="update">
+UPDATE ADMIN
+SET ADMIN_BIRTH = #{admin_birth}, ADMIN_EMAIL = #{admin_email}
+, ADMIN_NAME = #{admin_name}, GENDER_NUM = #{gender_num}, ADMIN_TEL = #{admin_tel}
+WHERE ADMIN_NUM = #{admin_num}
+</update>
+
+</mapper>

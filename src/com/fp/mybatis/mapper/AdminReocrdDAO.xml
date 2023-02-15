@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fp.mybatis.IAdminRecordDAO">
+	
+	<select id="cardCount" resultType="java.lang.Integer">
+		SELECT COUNT(*) AS COUNT
+		FROM CARD
+		WHERE CARD_LOCATION LIKE '%'||#{keyword}||'%'
+	</select>
+	
+	<select id="cardList" parameterType="java.lang.String" resultType="com.fp.dto.CardDTO">
+		SELECT RNUM, CARD_NUM, CARD_LOCATION, BLIND, CARD_BUDGET, USER_NAME, TO_CHAR(CARD_DATE, 'YYYY-MM-DD') AS CARD_DATE
+		FROM (SELECT ROWNUM AS RNUM, DATA.*
+		      FROM (SELECT CARD_NUM, CARD_LOCATION, BLIND, CARD_BUDGET, USER_NAME, CARD_DATE
+		            FROM VIEW_CARDLIST
+		            WHERE CARD_LOCATION LIKE '%'||#{keyword}||'%'
+		            ORDER BY CARD_NUM DESC) DATA)
+		WHERE RNUM <![CDATA[>=]]> #{start} AND RNUM <![CDATA[<=]]> #{end}
+	</select>
+	
+	<select id="cardSearch" resultType="com.fp.dto.CardDTO">
+		SELECT CARD_NUM, SIGN_NUM, CARD_LAT, CARD_LNG, CARD_ZIPCODE, CARD_ADDRESS, CARD_SADDRESS, CARD_LOCATION
+			 , CARD_BUDGET, CARD_COMMENT, CARD_IMG1, CARD_IMG2, CARD_IMG3, TO_DATE(CARD_VISITDATE, 'YYYY-MM-DD') AS CARD_VISIDAE
+			 , TO_DATE(CARD_DATE, 'YYYY-MM-DD') AS CARD_DATE
+		FROM CARD
+		WHERE CARD_NUM = #{card_num}
+	</select>
+	
+	<select id="insertCardWarning" parameterType="java.lang.Integer">
+		EXEC PRC_ADMINCARDWARNING(#{card_num}, #{rreason_num}, #{creport_title}, #{creport_content}, #{admin_num}, #{type_num});
+	</select>
+	
+	<select id="bookCount" resultType="java.lang.Integer">
+		SELECT COUNT(*) AS COUNT
+		FROM BOOK
+		WHERE BOOK_TITLE LIKE '%'||#{keyword}||'%'
+	</select>
+	
+	<select id="bookList" parameterType="java.lang.String" resultType="com.fp.dto.BookDTO">
+		SELECT RNUM, BOOK_NUM, BOOK_TITLE, USER_NAME, TO_CHAR(BOOK_DATE, 'YYYY-MM-DD') AS BOOK_DATE, BLINE
+		FROM (SELECT ROWNUM AS RNUM, DATA.*
+		      FROM (SELECT BOOK_NUM, BOOK_TITLE, USER_NAME, BOOK_DATE, BLINE
+		            FROM VIEW_BOOKLIST
+		            WHERE BOOK_TITLE LIKE '%'||#{keyword}||'%'
+		            ORDER BY BOOK_NUM DESC) DATA)
+		WHERE RNUM <![CDATA[>=]]> #{start} AND RNUM <![CDATA[<=]]> #{end}
+	</select>
+	
+	<select id="bookSearch" resultType="com.fp.dto.BookDTO">
+		SELECT BOOK_NUM, BCATEGORY_NAME, BOOK_TITLE, BOOK_COMMENT, TO_CHAR(BOOK_DATE, 'YYYY-MM-DD HH:MM') AS BOOK_DATE, USER_NAME
+		FROM VIEW_BOOKLIST
+		WHERE BOOK_NUM = #{book_num}
+	</select>
+	
+	<select id="insertBookWarning" parameterType="java.lang.Integer">
+		EXEC PRC_ADMINBOOKWARNING(#{book_num}, #{rreason_num}, #{breport_title}, #{breport_content}, #{admin_num}, #{type_num});
+	</select>
+	
+</mapper>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fp.mybatis.IAdminFaqDAO">
+	
+	<select id="count" resultType="java.lang.Integer">
+		SELECT COUNT(*) AS COUNT
+		FROM FAQ
+	</select>
+	
+	<select id="searchCount" resultType="java.lang.Integer">
+		SELECT COUNT(*) AS COUNT
+		FROM FAQ
+		WHERE QCATEGORY_NUM = #{qcategory_num}
+	</select>
+	
+	<select id="list" parameterType="java.lang.Integer" resultType="com.fp.dto.FaqDTO">
+		SELECT RNUM, FAQ_NUM, QCATEGORY_NUM, FAQ_QUESTION, FAQ_ANSWER
+		FROM (SELECT ROWNUM AS RNUM, DATA.*
+			  FROM (SELECT FAQ_NUM, QCATEGORY_NUM, FAQ_QUESTION, FAQ_ANSWER
+			  		FROM VIEW_FAQLIST
+			  		ORDER BY FAQ_NUM DESC) DATA)
+		WHERE RNUM <![CDATA[>=]]> #{start} AND RNUM <![CDATA[<=]]> #{end}
+	</select>
+	
+	<select id="searchList" parameterType="java.lang.Integer" resultType="com.fp.dto.FaqDTO">
+		SELECT RNUM, FAQ_NUM, QCATEGORY_NUM, FAQ_QUESTION, FAQ_ANSWER
+		FROM (SELECT ROWNUM AS RNUM, DATA.*
+			  FROM (SELECT FAQ_NUM, QCATEGORY_NUM, FAQ_QUESTION, FAQ_ANSWER
+			  		FROM VIEW_FAQLIST
+			  		WHERE QCATEGORY_NUM = #{qcategory_num}
+			  		ORDER BY FAQ_NUM DESC) DATA)
+		WHERE RNUM <![CDATA[>=]]> #{start} AND RNUM <![CDATA[<=]]> #{end}
+	</select>
+	
+	<select id="search" resultType="com.fp.dto.FaqDTO">
+		SELECT FAQ_NUM, QCATEGORY_NUM, FAQ_QUESTION, FAQ_ANSWER
+		FROM VIEW_FAQLIST
+		WHERE FAQ_NUM = #{faq_num}
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO FAQ(FAQ_NUM, QCATEGORY_NUM, ADMIN_NUM, FAQ_QUESTION, FAQ_ANSWER)
+		VALUES(FAQ_SEQ.NEXTVAL, #{qcategory_num}, #{admin_num}, #{faq_question}, #{faq_answer})
+	</insert>
+	
+	<update id="update">
+		UPDATE FAQ
+		SET QCATEGORY_NUM = #{qcategory_num}, FAQ_QUESTION = #{faq_question}, FAQ_ANSWER = #{faq_answer}
+		WHERE FAQ_NUM = #{faq_num}
+	</update>
+	
+	<delete id="delete">
+		DELETE
+		FROM FAQ
+		WHERE FAQ_NUM = #{faq_num}
+	</delete>
+	
+
+</mapper>

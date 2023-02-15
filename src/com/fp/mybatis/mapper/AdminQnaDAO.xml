@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fp.mybatis.IAdminQnaDAO">
+	
+	<select id="count" resultType="java.lang.Integer">
+		SELECT COUNT(*) AS COUNT
+		FROM (SELECT V.*, CASE WHEN ANSWER_NUM=0 THEN '미처리'ELSE '처리완료'END AS QUESTION_DONE
+	  		  FROM VIEW_QNA V)
+		WHERE QUESTION_DONE LIKE '%'||#{question_done}||'%'
+	</select>
+	
+	<select id="list" parameterType="java.lang.String" resultType="com.fp.dto.QnaDTO">
+		SELECT RNUM, QUESTION_NUM, QCATEGORY_CLASS, QUESTION_TITLE, ADMIN_NAME, USER_NAME
+     		 , ANSWER_NUM, QUESTION_DONE, QUESTION_DATE 
+		FROM (SELECT ROWNUM AS RNUM, DATA.*
+      		  FROM (SELECT QUESTION_NUM, QCATEGORY_CLASS, QUESTION_TITLE, ADMIN_NAME, USER_NAME
+                  		 , ANSWER_NUM, CASE WHEN ANSWER_NUM=0 THEN '미처리'ELSE '처리완료'END AS QUESTION_DONE, TO_CHAR(QUESTION_DATE, 'YYYY-MM-DD') AS QUESTION_DATE 
+            		FROM VIEW_QNA
+            		ORDER BY QUESTION_NUM DESC) DATA)
+		WHERE RNUM <![CDATA[>=]]> #{start} AND RNUM <![CDATA[<=]]> #{end}
+       		   AND QUESTION_DONE LIKE '%'||#{question_done}||'%'
+	</select>
+	
+	<select id="searchQuestion" resultType="com.fp.dto.QnaDTO">
+		SELECT QUESTION_NUM, QCATEGORY_CLASS, USER_NAME, TO_CHAR(QUESTION_DATE, 'YYYY-MM-DD HH:MM') AS QUESTION_DATE , QUESTION_TITLE, QUESTION_CONTENT
+			 , ANSWER_CONTENT, TO_CHAR(ANSWER_DATE, 'YYYY-MM-DD') AS ANSWER_DATE
+		FROM VIEW_QNA
+		WHERE QUESTION_NUM = #{question_num}
+	</select>
+
+	<select id="searchAnswer" resultType="com.fp.dto.QnaDTO">
+		SELECT ANSWER_NUM, ANSWER_CONTENT
+		FROM VIEW_FAQLIST
+		WHERE ANSWER_NUM = #{answer_num}
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO ANSWER(ANSWER_NUM, QUESTION_NUM, ANSWER_CONTENT, ADMIN_NUM)
+		VALUES(ANSWER_SEQ.NEXTVAL, #{question_num}, #{answer_content}, #{admin_num})
+	</insert>
+	
+
+</mapper>

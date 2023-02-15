@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="com.fp.mybatis.IAdminMainDAO">
+
+	<select id="memberCount" resultType="java.lang.Integer">
+		SELECT COUNT(*) AS COUNT
+		FROM USERS
+	</select>
+
+	<select id="bookCount" resultType="java.lang.Integer">
+	   SELECT COUNT(*) AS COUNT
+		FROM BOOK
+	</select>
+
+	<select id="newReportList" resultType="com.fp.dto.AdminMainDTO">		
+	    SELECT TYPE, REPORT_NUM, ARTICLE, REPORT_TITLE, REPORTER, REASON, REPORT_DATE, STATUS_NUM
+		FROM VIEW_REPORTLIST 
+		WHERE STATUS_NUM = 0
+		ORDER BY REPORT_DATE
+	</select>
+	
+	<select id="newQuestionList" resultType="com.fp.dto.AdminMainDTO">
+		SELECT QUESTION_NUM, QCATEGORY_NUM, QUESTION_TITLE, QUESTION_DATE, ANSWER_NUM, QCATEGORY_CLASS
+		FROM VIEW_QNA
+		WHERE ANSWER_NUM = 0
+		ORDER BY QUESTION_DATE
+	</select>
+	
+
+</mapper>

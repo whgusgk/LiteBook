@@ -1,0 +1,58 @@
+@charset "UTF-8";
+
+
+div
+{
+	margin: 5px 0px;
+}
+
+.main_header
+{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.main_leftHeader, .main_leftFooter
+{
+	display: flex;
+	justify-content: flex-start;
+}
+
+.main_rightHeader, .main_rightFooter
+{
+	display: flex;
+	justify-content: flex-end;
+}
+
+.main_listSelect
+{
+	display: grid;
+	justify-items: left;
+	width: 100px;
+}
+
+#addBtn, #submitBtn, #questionBtn, #notBlind
+{
+	background-color: #1DB1F8;
+	border: #1DB1F8;
+}
+
+#addBtn
+{
+	display: grid;
+	justify-items: right;
+	margin-bottom: 5px;
+}
+
+.main_list thead
+{
+	background-color: rgba(241, 240, 240, 0.96);
+}
+
+.main_page
+{
+	text-align: center;
+}
+
+

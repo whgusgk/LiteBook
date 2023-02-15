@@ -1,0 +1,124 @@
+ 	@charset "UTF-8";
+ 
+ .Site {
+     display: flex;
+     min-height: 1200px;;
+     flex-direction: column;
+   }
+   
+     .Site-content {
+     flex: 1;
+     min-height: 1200px;
+     
+   }  
+   .pageNav{
+      margin-top:60px;
+     margin-left:45%;   
+      bottom: 30px;
+      width:30%;
+   }
+  .main_header{
+    display:flex;
+    justify-content:space-between; 
+    width:80%;
+  }
+  .main_leftHeader{
+     margin-left:350px;
+  }
+  .main_rightHeader{
+     margin_right:350px;
+  }
+  .main_title{
+    margin-top:30px;
+     margin-left:350px;
+  }
+  .main_list{
+     width:60%;
+     margin:auto;
+  }
+  .spaceArea{
+     width:100%;
+     height:100px;
+  }
+  .main_title h3{
+     font-size:20px;
+     display:inline-block;
+  }
+  .main_title h5{
+      font-size:15px;
+      margin-left:3px;
+     display:inline-block;
+  }
+
+body{
+    margin-top:30px;
+    background:#f8f8f8
+}
+       
+    table
+    {
+       margin-left: 30px;
+         margin-right: 50px;
+    }  
+  .telInput{
+      display:flex;
+      gap:10px;
+      width: 10;
+   }
+
+   #nameCheck{
+         position:absolute;
+         top:238px;
+         left:900px;
+   }
+   #pwdChange{
+         position:absolute;
+         top:300px;
+         left:900px;
+   }
+  
+    .validation-form{
+       padding-left:100px;
+    }
+    .radio_gender label{
+       margin-right:90px;
+    }
+    
+    .center
+    {
+       align: center;
+    }
+    .submitBtn
+     {
+      background-color: #3b5998;
+   }
+   .submitBtns{
+      margin-left:120px;
+   }
+.profileRow{
+   display:flex;
+   justify-content:center;
+}
+
+.mt-10{
+   margin-top:0px;
+   padding:0;
+   overflow:hidden;
+   display:flex;
+   justify-content:center;
+}
+.changeBtn{
+   margin:0;
+   padding:0;
+}
+
+form{
+   margin:auto;
+}
+.tab-content{
+   margin-left:27%;
+}
+
+.container{
+   margin-top: 60px;
+}
